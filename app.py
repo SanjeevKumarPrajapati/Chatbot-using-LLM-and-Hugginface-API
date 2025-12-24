@@ -3,9 +3,10 @@ from langchain_core.prompts import PromptTemplate,ChatPromptTemplate, MessagesPl
 from langchain_core.output_parsers import StrOutputParser
 from langchain_core.messages import HumanMessage,SystemMessage,AIMessage
 import streamlit as st
+import tempfile
 import time
 
-
+HF_TOKEN="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"
 
 llm=HuggingFaceEndpoint(
     repo_id="google/gemma-2-2b-it",
@@ -76,6 +77,7 @@ st.markdown("""
     font-style: italic;
     color: #6b7280;
 }
+
 </style>
 """, unsafe_allow_html=True)
 
@@ -94,9 +96,18 @@ st.sidebar.markdown("Customize your chatbot experience")
 if st.sidebar.button("🧹 Clear Chat"):
     st.session_state.messages = []
 
+st.sidebar.markdown("---")
+st.sidebar.subheader("🧠 Your Chats")
+
+
 # ---------- Session state ----------
 if "messages" not in st.session_state:
     st.session_state.messages = []   # UI memory
+    
+if "documents" not in st.session_state:
+    st.session_state.documents = []
+
+
     
 if "lc_messages" not in st.session_state:
     st.session_state.lc_messages = [ # LLM memory
@@ -122,7 +133,6 @@ for msg in st.session_state.messages:
 st.markdown('</div>', unsafe_allow_html=True)
 
 
-
 # ---------- Chat input ----------
 user_input = st.chat_input("Type your message...")
 
@@ -137,6 +147,26 @@ if user_input:
     )
     # Rerender immediately
     st.rerun()
+
+#previous chats
+if "messages" in st.session_state and st.session_state.messages:
+    user_prompts = [
+        msg["content"]
+        for msg in st.session_state.messages
+        if msg["role"] == "user"
+    ]
+
+    if user_prompts:
+        for i, prompt in enumerate(reversed(user_prompts[-10:]), 1):
+            st.sidebar.markdown(
+                f"**{i}.** {prompt[:60]}{'...' if len(prompt) > 60 else ''}"
+            )
+    else:
+        st.sidebar.caption("No prompts yet")
+else:
+    st.sidebar.caption("No prompts yet")
+
+
 
 # ---------- Generate bot response ----------
 if st.session_state.messages and st.session_state.messages[-1]["role"] == "user":
