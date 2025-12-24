@@ -1,0 +1,8 @@
+streamlit>=1.22
+langchain>=0.1.0
+langchain-huggingface>=0.0.4
+langchain-community>=0.0.5
+huggingface-hub>=0.16.4
+streamlit-authenticator>=0.3.0
+streamlit-login-auth-ui>=0.0.9
+pyngrok>=6.0
