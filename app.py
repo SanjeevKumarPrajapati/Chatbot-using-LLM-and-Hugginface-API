@@ -5,8 +5,9 @@ from langchain_core.messages import HumanMessage,SystemMessage,AIMessage
 import streamlit as st
 import tempfile
 import time
+import os
 
-HF_TOKEN="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"
+HF_TOKEN = os.environ["HF_TOKEN"]
 
 llm=HuggingFaceEndpoint(
     repo_id="google/gemma-2-2b-it",
@@ -201,3 +202,4 @@ if st.session_state.messages and st.session_state.messages[-1]["role"] == "user"
         )
         time.sleep(0.1)
         st.rerun()
+
