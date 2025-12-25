@@ -2,6 +2,7 @@ from langchain_huggingface import ChatHuggingFace, HuggingFaceEndpoint
 from langchain_core.prompts import PromptTemplate,ChatPromptTemplate, MessagesPlaceholder
 from langchain_core.output_parsers import StrOutputParser
 from langchain_core.messages import HumanMessage,SystemMessage,AIMessage
+from langchain_community.document_loaders import PyPDFLoader, Docx2txtLoader
 import streamlit as st
 import tempfile
 import time
@@ -283,3 +284,4 @@ if st.session_state.messages and st.session_state.messages[-1]["role"] == "user"
         )
         time.sleep(0.1)
         st.rerun()
+
