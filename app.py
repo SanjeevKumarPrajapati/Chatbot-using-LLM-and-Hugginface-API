@@ -16,10 +16,14 @@ llm=HuggingFaceEndpoint(
     streaming=True,
 )
 prompt = ChatPromptTemplate.from_messages([
-    ("system", "You are a helpful assistant."),
+    ("system",
+     "You are a helpful assistant. "
+     "Answer ONLY using the provided document. "
+     "If the answer is not in the document, say you don't know.\n\n"
+     "Document:\n{context}"
+    ),
     MessagesPlaceholder("messages")
 ])
-
 model=ChatHuggingFace(llm=llm)
 parser=StrOutputParser()
 chain = prompt | model | parser
@@ -78,7 +82,12 @@ st.markdown("""
     font-style: italic;
     color: #6b7280;
 }
-
+.file-upload-container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin-top: 20px;  
+}
 </style>
 """, unsafe_allow_html=True)
 
@@ -105,10 +114,12 @@ st.sidebar.subheader("🧠 Your Chats")
 if "messages" not in st.session_state:
     st.session_state.messages = []   # UI memory
     
-if "documents" not in st.session_state:
-    st.session_state.documents = []
+if "doc_text" not in st.session_state:
+    st.session_state.doc_text = ""
 
 
+if "doc_name" not in st.session_state:
+    st.session_state.doc_name = None
     
 if "lc_messages" not in st.session_state:
     st.session_state.lc_messages = [ # LLM memory
@@ -133,7 +144,76 @@ for msg in st.session_state.messages:
 
 st.markdown('</div>', unsafe_allow_html=True)
 
+def reset_doc():
+    st.session_state.doc_text = ""
+    st.session_state.doc_name = None
+    st.session_state.lc_messages = [
+        SystemMessage(content="You are a helpful assistant.")
+    ]
+    st.session_state.messages = []
 
+
+uploaded_file = st.file_uploader(" ", type=["pdf", "docx", "txt"],key="doc_uploader" )
+
+if uploaded_file:
+
+    # 🔁 New document uploaded
+    if st.session_state.doc_name != uploaded_file.name:
+        reset_doc()
+        st.session_state.doc_name = uploaded_file.name
+
+        uploaded_file.seek(0)
+
+        try:
+            # ---------- PDF ----------
+            if uploaded_file.name.lower().endswith(".pdf"):
+                with tempfile.NamedTemporaryFile(delete=False, suffix=".pdf") as tmp:
+                    tmp.write(uploaded_file.read())
+                    path = tmp.name
+
+                loader = PyPDFLoader(path)
+                docs = loader.load()
+
+                st.session_state.doc_text = "\n".join(
+                    d.page_content for d in docs if d.page_content.strip()
+                )
+
+            # ---------- DOCX ----------
+            elif uploaded_file.name.lower().endswith(".docx"):
+                with tempfile.NamedTemporaryFile(delete=False, suffix=".docx") as tmp:
+                    tmp.write(uploaded_file.read())
+                    path = tmp.name
+
+                loader = Docx2txtLoader(path)
+                docs = loader.load()
+
+                st.session_state.doc_text = "\n".join(
+                    d.page_content for d in docs if d.page_content.strip()
+                )
+
+            # ---------- TXT ----------
+            elif uploaded_file.name.lower().endswith(".txt"):
+                content = uploaded_file.read()
+                st.session_state.doc_text = content.decode(
+                    "utf-8", errors="ignore"
+                )
+
+            else:
+                st.error("Unsupported file type")
+
+            if not st.session_state.doc_text.strip():
+                st.error("Document is empty or unreadable")
+            else:
+                st.success(f"📄 Now using: {uploaded_file.name}")
+
+        except Exception as e:
+            st.error(f"Failed to load document: {e}")
+
+    else:
+        st.info(f"📄 Using current document: {st.session_state.doc_name}")
+
+
+        
 # ---------- Chat input ----------
 user_input = st.chat_input("Type your message...")
 
@@ -173,10 +253,11 @@ else:
 if st.session_state.messages and st.session_state.messages[-1]["role"] == "user":
     with st.spinner("Thinking..."):
         #time.sleep(0.6)  # simulate thinking
-        
+        context = st.session_state.get("doc_text", "")
         bot_response = chain.invoke(
             {
-                "messages": st.session_state.lc_messages
+                "messages": st.session_state.lc_messages,
+                "context": context[:4000]
             }
         )
 
@@ -202,4 +283,3 @@ if st.session_state.messages and st.session_state.messages[-1]["role"] == "user"
         )
         time.sleep(0.1)
         st.rerun()
-
