@@ -6,3 +6,5 @@ huggingface-hub>=0.16.4
 streamlit-authenticator>=0.3.0
 streamlit-login-auth-ui>=0.0.9
 pyngrok>=6.0
+pypdf==4.2.0
+docx2txt==0.8
