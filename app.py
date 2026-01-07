@@ -18,7 +18,7 @@ llm=HuggingFaceEndpoint(
 )
 prompt = ChatPromptTemplate.from_messages([
     ("system",
-     "You are a helpful assistant. "
+     "You are a helpful assistant and Your name is 'AI ChatBot' "
      "Answer ONLY using the provided document. "
      "If the answer is not in the document, say you don't know.\n\n"
      "Document:\n{context}"
@@ -284,4 +284,5 @@ if st.session_state.messages and st.session_state.messages[-1]["role"] == "user"
         )
         time.sleep(0.1)
         st.rerun()
+
 
