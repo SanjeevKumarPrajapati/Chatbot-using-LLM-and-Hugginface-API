@@ -1,6 +1,6 @@
 # 🤖 LLM-Powered Chatbot (Hugging Face)
 
-[![Live Demo](https://img.shields.io/badge/Live-Demo-brightgreen)](https://your-live-project-link.com)
+[![Live Demo](https://img.shields.io/badge/Live-Demo-brightgreen)](https://smarttopassistant.streamlit.app/)
 [![Hugging Face](https://img.shields.io/badge/HuggingFace-Inference_API-yellow)](https://huggingface.co/)
 [![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE)
 [![Status](https://img.shields.io/badge/Status-Active-success)]()
@@ -32,7 +32,7 @@ The project demonstrates how to integrate **state-of-the-art NLP models** for co
 ## 🔗 Live Project
 
 👉 **Try the chatbot here:**  
-[https://your-live-project-link.com](https://your-live-project-link.com)
+[Project Link](https://smarttopassistant.streamlit.app/)
 
 ---
 
@@ -48,28 +48,11 @@ The project demonstrates how to integrate **state-of-the-art NLP models** for co
 
 ## 🧩 Tech Stack
 
-- **Frontend:** HTML / CSS / React (optional)
-- **Backend:** Node.js / Python
+- **Frontend:** Streamlit
+- **Backend:** Python
 - **AI Models:** Hugging Face LLMs
 - **API:** Hugging Face Inference API
 
 ---
 
-## 🧪 Setup & Installation
 
-```bash
-# Clone the repository
-git clone https://github.com/your-username/llm-chatbot-huggingface.git
-
-# Navigate to the project directory
-cd llm-chatbot-huggingface
-
-# Install dependencies
-npm install
-# or
-pip install -r requirements.txt
-
-# Run the project
-npm start
-# or
-python app.py
